@@ -17,7 +17,7 @@ func InitRedis() {
 
 	RedisClient = redis.NewClient(&redis.Options{
 		Addr:     redisAddr,                      // Redis server address
-		Password: "",                             // No password set
+		Password: system.Env("REDIS_PASS", ""),   // No password set
 		DB:       system.EnvAsInt("REDIS_DB", 1), // use default DB
 	})
 }
