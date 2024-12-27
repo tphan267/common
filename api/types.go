@@ -29,8 +29,8 @@ type ApiError struct {
 }
 
 type ApiResponse struct {
-	Success bool            `json:"success"`
-	Data    interface{}     `json:"data,omitempty"`
-	Error   ApiError        `json:"error,omitempty"`
-	Meta    ApiResponseMeta `json:"meta,omitempty"`
+	Success bool             `json:"success"`
+	Data    interface{}      `json:"data,omitempty"`
+	Error   *ApiError        `json:"error,omitempty"`
+	Meta    *ApiResponseMeta `json:"meta,omitempty"`
 }
