@@ -13,7 +13,7 @@ import (
 
 var (
 	DB  *gorm.DB
-	dbs map[string]*gorm.DB
+	dbs = map[string]*gorm.DB{}
 )
 
 func ConnDB(conn string) *gorm.DB {

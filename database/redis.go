@@ -14,7 +14,6 @@ var (
 
 func InitRedis() {
 	redisAddr := fmt.Sprintf("%s:6379", system.Env("REDIS_HOST", "localhost"))
-
 	RedisClient = redis.NewClient(&redis.Options{
 		Addr:     redisAddr,                      // Redis server address
 		Password: system.Env("REDIS_PASS", ""),   // No password set
