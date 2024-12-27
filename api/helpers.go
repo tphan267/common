@@ -25,3 +25,26 @@ func ErrorResp(c *fiber.Ctx, err ApiError, meta ...ApiResponseMeta) error {
 	}
 	return c.Status(fiber.StatusOK).JSON(&resp)
 }
+
+func ErrorCodeResp(c *fiber.Ctx, code int, message ...string) error {
+	msg := "API Error"
+	if len(message) > 0 {
+		msg = message[0]
+	}
+	return ErrorResp(c, ApiError{
+		Code:    code,
+		Message: msg,
+	})
+}
+
+func ErrorUnauthorizedResp(c *fiber.Ctx, message ...string) error {
+	return ErrorCodeResp(c, fiber.StatusUnauthorized, message...)
+}
+
+func ErrorBadRequestResp(c *fiber.Ctx, message ...string) error {
+	return ErrorCodeResp(c, fiber.StatusBadRequest, message...)
+}
+
+func ErrorInternalServerErrorResp(c *fiber.Ctx, message ...string) error {
+	return ErrorCodeResp(c, fiber.StatusInternalServerError, message...)
+}
