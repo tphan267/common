@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"crypto/md5"
 	"crypto/rand"
 	"encoding/json"
 	"fmt"
@@ -50,4 +51,8 @@ func ToString(data interface{}) string {
 		return ""
 	}
 	return string(text)
+}
+
+func HashKey(key string) string {
+	return fmt.Sprintf("%x", md5.Sum([]byte(key)))
 }

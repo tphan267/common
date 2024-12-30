@@ -23,7 +23,11 @@ func ErrorResp(c *fiber.Ctx, err ApiError, meta ...ApiResponseMeta) error {
 	if len(meta) > 0 {
 		resp.Meta = &meta[0]
 	}
-	return c.Status(fiber.StatusOK).JSON(&resp)
+	code := fiber.StatusBadRequest
+	if err.Code != 0 {
+		code = err.Code
+	}
+	return c.Status(code).JSON(&resp)
 }
 
 func ErrorCodeResp(c *fiber.Ctx, code int, message ...string) error {

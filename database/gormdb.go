@@ -2,7 +2,6 @@ package database
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/tphan267/common/system"
 	"gorm.io/driver/mysql"
@@ -37,9 +36,9 @@ func ConnMySqlDB(conn string, envPrefix string) *gorm.DB {
 		Logger: logger.Default.LogMode(logger.LogLevel(system.EnvAsInt(envPrefix+"_LOG_LEVEL", 3))),
 	})
 	if err != nil {
-		panic("Failed to connect to database")
+		system.Logger.Panic("Failed to connect to database")
 	}
-	log.Printf("Connect to MySQL Database: '%s'\n", system.Env("DB_NAME"))
+	system.Logger.Infof("Connect to MySQL Database: '%s'\n", system.Env("DB_NAME"))
 	dbs[conn] = db
 	return db
 }
@@ -58,9 +57,9 @@ func ConnPostgresDB(conn string, envPrefix string) *gorm.DB {
 		Logger: logger.Default.LogMode(logger.LogLevel(system.EnvAsInt(envPrefix+"_LOG_LEVEL", 3))),
 	})
 	if err != nil {
-		panic("Failed to connect to database")
+		system.Logger.Panic("Failed to connect to database")
 	}
-	log.Printf("Connect to Postgres Database: '%s'\n", system.Env("DB_NAME"))
+	system.Logger.Infof("Connect to Postgres Database: '%s'\n", system.Env("DB_NAME"))
 	dbs[conn] = db
 	return db
 }
