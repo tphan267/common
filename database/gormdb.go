@@ -33,7 +33,7 @@ func ConnMySqlDB(conn string, envPrefix string) *gorm.DB {
 	// To handle time.Time correctly, you need to include parseTime as a parameter. (more parameters)
 	// To fully support UTF-8 encoding, you need to change charset=utf8 to charset=utf8mb4. See this article for a detailed explanation
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.LogLevel(system.EnvAsInt(envPrefix+"_LOG_LEVEL", 3))),
+		Logger: logger.Default.LogMode(logger.LogLevel(system.EnvInt(envPrefix+"_LOG_LEVEL", 3))),
 	})
 	if err != nil {
 		system.Logger.Panic("Failed to connect to database")
@@ -54,7 +54,7 @@ func ConnPostgresDB(conn string, envPrefix string) *gorm.DB {
 	}
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", system.Env(envPrefix+"_HOST"), system.Env(envPrefix+"_USER"), system.Env(envPrefix+"_PASS"), system.Env(envPrefix+"_NAME"), DB_PORT)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.LogLevel(system.EnvAsInt(envPrefix+"_LOG_LEVEL", 3))),
+		Logger: logger.Default.LogMode(logger.LogLevel(system.EnvInt(envPrefix+"_LOG_LEVEL", 3))),
 	})
 	if err != nil {
 		system.Logger.Panic("Failed to connect to database")

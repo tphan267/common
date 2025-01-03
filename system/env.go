@@ -12,7 +12,7 @@ var loadEnv = false
 
 // Config function to get value from env file
 // perhaps not the best implementation
-func Env(key string, _default ...string) string {
+func Env(key string, defaultValue ...string) string {
 	// load .env file
 	if loadEnv == false {
 		if _, err := os.Stat(".env"); err != nil {
@@ -26,21 +26,22 @@ func Env(key string, _default ...string) string {
 	}
 
 	val := os.Getenv(key)
-	if val == "" && len(_default) > 0 {
-		return _default[0]
+	if val == "" && len(defaultValue) > 0 {
+		return defaultValue[0]
 	}
 
 	return val
 }
 
-func EnvAsInt(key string, _default int) int {
+func EnvInt(key string, defaultValue ...int) int {
 	if val := Env(key); val != "" {
-		iVal, err := strconv.Atoi(val)
-		if err != nil {
-			return _default
+		intVal, err := strconv.Atoi(val)
+		if err == nil {
+			return intVal
 		}
-		return iVal
 	}
-
-	return _default
+	if len(defaultValue) > 0 {
+		return defaultValue[0]
+	}
+	return 0
 }

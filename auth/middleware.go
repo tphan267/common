@@ -2,53 +2,61 @@ package auth
 
 import (
 	"fmt"
-
-	"github.com/tphan267/common/api"
-	"github.com/tphan267/common/system"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
-	jwtware "github.com/gofiber/jwt/v2"
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/tphan267/common/api"
+	"github.com/tphan267/common/cache"
+	"github.com/tphan267/common/http"
+	"github.com/tphan267/common/system"
 )
 
-func AuthMiddleware() fiber.Handler {
-	return jwtware.New(jwtware.Config{
-		ErrorHandler:   authError,
-		SuccessHandler: authSuccess,
-		SigningKey:     []byte(system.Env("JWT_SECRET")),
-		SigningMethod:  "HS256",
-		ContextKey:     "authToken",
-		TokenLookup:    fmt.Sprintf("header:%s,cookie:auth_token,query:auth_token", fiber.HeaderAuthorization),
-	})
+func RemoteAuthMiddleware() fiber.Handler {
+	extractTokens := "header:Authorization,query:auth_token"
+	return remoteMiddleware(extractTokens)
 }
 
-func authError(ctx *fiber.Ctx, err error) error {
-	accept := ctx.Get("Accept")
-	uri := ctx.Query("redirect_uri")
+func RemoteAPIKeyMiddleware() fiber.Handler {
+	extractTokens := "header:Authorization,query:apikey"
+	return remoteMiddleware(extractTokens)
+}
 
-	if accept != "application/json" && uri != "" {
-		return ctx.Redirect(uri)
+// RemoteMiddleware accept both auth_token or apikey
+func RemoteMiddleware() fiber.Handler {
+	extractTokens := "header:Authorization,query:auth_token,query:apikey"
+	return remoteMiddleware(extractTokens)
+}
+
+func remoteMiddleware(extractTokens ...string) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		token := ExtractToken(ctx, extractTokens...)
+		if token == "" {
+			return api.ErrorUnauthorizedResp(ctx, "Missing auth token or apikey")
+		}
+
+		act := &Account{}
+		err := cache.GetObj(token, act)
+
+		if err != nil || act.ID == 0 {
+			system.Logger.Errorf("[common/auth] caching error: %v", err)
+			resp := &AuthAccountResponse{}
+			err := http.Get(system.Env("AUTH_API")+"/auth/account", resp, "Authorization", "Bearer "+token)
+			if err != nil {
+				return api.ErrorUnauthorizedResp(ctx, err.Error())
+			}
+			if !resp.Success {
+				return api.ErrorUnauthorizedResp(ctx, resp.Error.Message)
+			}
+			act = resp.Data
+			duration, _ := time.ParseDuration(system.Env("AUTH_CACHE_DURATION", "1h"))
+			cache.SetObj(token, act, duration)
+		}
+
+		ctx.Locals("authToken", token)
+		ctx.Locals("account", act)
+		ctx.Locals("uiID", act.ID)
+		ctx.Locals("usID", fmt.Sprintf("%d", act.ID))
+
+		return ctx.Next()
 	}
-
-	return api.ErrorUnauthorizedResp(ctx, err.Error())
-}
-
-func authSuccess(ctx *fiber.Ctx) error {
-	jwtData := ctx.Locals("authToken").(*jwt.Token)
-	claims := jwtData.Claims.(jwt.MapClaims)
-	uiID := uint64(claims["id"].(float64))
-	usID := fmt.Sprintf("%d", uiID)
-
-	ctx.Locals("uiID", uiID)
-	ctx.Locals("usID", usID)
-
-	// // validate if user exist and to context
-	// account := &models.Account{}
-	// database.DB.Find(account, "id=?", id)
-	// if account.ID == 0 {
-	// 	return api.ErrorUnauthorizedResp(ctx, fmt.Sprintf("Account #%v does not exist!", id))
-	// }
-	// ctx.Locals("account", account)
-
-	return ctx.Next()
 }

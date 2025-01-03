@@ -41,6 +41,10 @@ func ErrorCodeResp(c *fiber.Ctx, code int, message ...string) error {
 	})
 }
 
+func ErrorNotFoundResp(c *fiber.Ctx, message ...string) error {
+	return ErrorCodeResp(c, fiber.StatusNotFound, message...)
+}
+
 func ErrorUnauthorizedResp(c *fiber.Ctx, message ...string) error {
 	return ErrorCodeResp(c, fiber.StatusUnauthorized, message...)
 }

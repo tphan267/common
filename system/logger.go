@@ -14,8 +14,8 @@ func InitLogger(prefix string) {
 		LogFileMaxNum:     500,
 		LogFileNumToDel:   50,
 		LogFilenamePrefix: prefix,
-		LogLevel:          logger.LogLevel(EnvAsInt("SYS_LOG_LEVEL", 2)), // sysLogger.LogLevelTrace,
-		LogDest:           logger.LogDestConsole,                         // sysLogger.LogDestConsole | logger.LogDestFile
+		LogLevel:          logger.LogLevel(EnvInt("SYS_LOG_LEVEL", 2)), // sysLogger.LogLevelTrace,
+		LogDest:           logger.LogDestConsole,                       // sysLogger.LogDestConsole | logger.LogDestFile
 		Flag:              logger.ControlFlagLogDate | logger.ControlFlagLogLineNum,
 	})
 	if err != nil {
