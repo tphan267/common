@@ -1,14 +1,15 @@
 package auth
 
 import (
+	"errors"
 	"fmt"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/tphan267/common/api"
 	"github.com/tphan267/common/cache"
 	"github.com/tphan267/common/http"
 	"github.com/tphan267/common/system"
+	"github.com/tphan267/common/utils"
 )
 
 func RemoteAuthMiddleware() fiber.Handler {
@@ -34,22 +35,9 @@ func remoteMiddleware(extractTokens ...string) fiber.Handler {
 			return api.ErrorUnauthorizedResp(ctx, "Missing auth token or apikey")
 		}
 
-		act := &Account{}
-		err := cache.GetObj(token, act)
-
-		if err != nil || act.ID == 0 {
-			system.Logger.Errorf("[common/auth] caching error: %v", err)
-			resp := &AuthAccountResponse{}
-			err := http.Get(system.Env("AUTH_API")+"/auth/account", resp, "Authorization", "Bearer "+token)
-			if err != nil {
-				return api.ErrorUnauthorizedResp(ctx, err.Error())
-			}
-			if !resp.Success {
-				return api.ErrorUnauthorizedResp(ctx, resp.Error.Message)
-			}
-			act = resp.Data
-			duration, _ := time.ParseDuration(system.Env("AUTH_CACHE_DURATION", "1h"))
-			cache.SetObj(token, act, duration)
+		act, err := RemoteAccount(token)
+		if err != nil {
+			return api.ErrorUnauthorizedResp(ctx, err.Error())
 		}
 
 		ctx.Locals("authToken", token)
@@ -59,4 +47,26 @@ func remoteMiddleware(extractTokens ...string) fiber.Handler {
 
 		return ctx.Next()
 	}
+}
+
+func RemoteAccount(token string) (act *AuthTokenData, err error) {
+	act = &AuthTokenData{}
+	err = cache.GetObj(token, act)
+
+	if err != nil || act.ID == 0 {
+		err = nil
+		resp := &AuthValidateResponse{}
+		err := http.Get(system.Env("AUTH_API")+"/auth/validate", resp, "Authorization", "Bearer "+token)
+		if err != nil {
+			return nil, err
+		}
+		if !resp.Success {
+			return nil, errors.New(resp.Error.Message)
+		}
+		act = resp.Data
+		duration, _ := utils.ParseDuration(system.Env("AUTH_CACHE_DURATION", "1h"))
+		cache.SetObj(token, act, duration)
+	}
+
+	return act, err
 }

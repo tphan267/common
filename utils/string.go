@@ -14,17 +14,30 @@ const (
 	alphabets = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 )
 
-func GenerateID() (string, error) {
-	id := make([]byte, idLength)
+func GenerateRandomString(length int, seeds ...string) (string, error) {
+	id := make([]byte, length)
+	seed := alphabets
+	if len(seeds) > 0 {
+		seed = seeds[0]
+	}
 	// Generate prefix
-	for i := 0; i < idLength; i++ {
-		char, err := rand.Int(rand.Reader, big.NewInt(int64(len(alphabets))))
+	for i := 0; i < length; i++ {
+		char, err := rand.Int(rand.Reader, big.NewInt(int64(len(seed))))
 		if err != nil {
 			return "", err
 		}
-		id[i] = alphabets[char.Int64()]
+		id[i] = seed[char.Int64()]
 	}
+
 	return string(id), nil
+}
+
+func GenerateID() (string, error) {
+	return GenerateRandomString(idLength)
+}
+
+func GeneratePassword(length int) (string, error) {
+	return GenerateRandomString(length, alphabets+"!@#$%^&*()_+")
 }
 
 func StringToInt(val string) int {
