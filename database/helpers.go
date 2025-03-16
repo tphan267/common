@@ -19,7 +19,11 @@ func Ordering(c *fiber.Ctx, meta ...*api.Map) func(db *gorm.DB) *gorm.DB {
 			if len(meta) > 0 {
 				(*meta[0])[orderBy] = ordering
 			}
-			return db.Order(orderBy + " " + ordering)
+		}
+		if len(meta) > 0 {
+			for key, val := range *meta[0] {
+				db.Order(key + " " + val.(string))
+			}
 		}
 		return db
 	}
