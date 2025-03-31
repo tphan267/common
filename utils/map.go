@@ -1,22 +1,20 @@
 package utils
 
-import "github.com/tphan267/common/types"
-
-func MapVal(m types.Map, key string, def ...interface{}) interface{} {
+func MapVal(m map[string]any, key string, defaultVal ...any) any {
 	val, ok := m[key]
 	if !ok {
-		if len(def) > 0 {
-			return def[0]
+		if len(defaultVal) > 0 {
+			return defaultVal[0]
 		}
 		return nil
 	}
 	return val
 }
 
-func MapIntVal(m types.Map, key string, def ...int) int {
-	return MapVal(m, key, def).(int)
+func MapIntVal(m map[string]any, key string, defaultVal ...int) int {
+	return MapVal(m, key, defaultVal).(int)
 }
 
-func MapStringVal(m types.Map, key string, def ...string) string {
-	return MapVal(m, key, def).(string)
+func MapStringVal(m map[string]any, key string, defaultVal ...string) string {
+	return MapVal(m, key, defaultVal).(string)
 }

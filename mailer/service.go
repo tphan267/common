@@ -2,10 +2,13 @@ package mailer
 
 import (
 	"crypto/tls"
+	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 
 	"github.com/tphan267/common/system"
+	"github.com/tphan267/common/types"
 	"github.com/tphan267/common/utils"
 	"gopkg.in/gomail.v2"
 )
@@ -25,10 +28,31 @@ func Init() {
 }
 
 func Send(to string, subject string, message string, isText ...bool) error {
+	opts := &types.Params{
+		"to": to,
+	}
+	return SendEx(opts, subject, message, isText...)
+}
+
+func SendEx(opts *types.Params, subject string, message string, isText ...bool) error {
 	m := gomail.NewMessage()
 	m.SetHeader("subject", subject)
-	m.SetHeader("From", DefaultSender)
-	m.SetHeader("To", to)
+
+	from := DefaultSender
+	if val := opts.GetString("from"); val != "" {
+		from = val
+	}
+	m.SetHeader("From", from)
+
+	if val, _ := getOptVal("to", opts); val != nil {
+		m.SetHeader("To", (*val)...)
+	}
+	if val, _ := getOptVal("cc", opts); val != nil {
+		m.SetHeader("Cc", (*val)...)
+	}
+	if val, _ := getOptVal("bcc", opts); val != nil {
+		m.SetHeader("Bcc", (*val)...)
+	}
 
 	if len(isText) > 0 && isText[0] {
 		m.SetBody("text/html", message)
@@ -45,4 +69,24 @@ func Send(to string, subject string, message string, isText ...bool) error {
 func NotifySupport(subject string, message interface{}) error {
 	htmlMesasge := "<pre>\n" + utils.ToString(message) + "</pre>"
 	return Send(Supporter, subject, htmlMesasge)
+}
+
+func getOptVal(key string, opts *types.Params) (*[]string, error) {
+	if val := opts.Get(key); val != nil {
+		var value []string
+		switch v := val.(type) {
+		case string:
+			if str := val.(string); str != "" {
+				pattern := `[,;\s]+`
+				re := regexp.MustCompile(pattern)
+				value = re.Split(val.(string), -1)
+			}
+		case []string:
+			value = val.([]string)
+		default:
+			return nil, fmt.Errorf("unknown type: %T", v)
+		}
+		return &value, nil
+	}
+	return nil, nil
 }

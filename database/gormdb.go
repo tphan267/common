@@ -11,8 +11,9 @@ import (
 )
 
 var (
-	DB  *gorm.DB
-	dbs = map[string]*gorm.DB{}
+	DB        *gorm.DB
+	RuntimeDB *gorm.DB
+	dbs       = map[string]*gorm.DB{}
 )
 
 func ConnDB(conn string) *gorm.DB {
@@ -38,13 +39,16 @@ func ConnMySqlDB(conn string, envPrefix string) *gorm.DB {
 	if err != nil {
 		system.Logger.Panic("Failed to connect to database")
 	}
-	system.Logger.Infof("Connect to MySQL Database: '%s'\n", system.Env("DB_NAME"))
+	system.Logger.Infof("Connect to MySQL Database: \"%s\"", system.Env("DB_NAME"))
 	dbs[conn] = db
 	return db
 }
 
-func InitMySqlDB() {
+func InitMySqlDB(withRuntime ...bool) {
 	DB = ConnMySqlDB("main", "DB")
+	if len(withRuntime) > 0 && withRuntime[0] {
+		RuntimeDB = ConnMySqlDB("runtime", "DB_RUNTIME")
+	}
 }
 
 func ConnPostgresDB(conn string, envPrefix string) *gorm.DB {
@@ -64,6 +68,9 @@ func ConnPostgresDB(conn string, envPrefix string) *gorm.DB {
 	return db
 }
 
-func InitPostgresDB() {
+func InitPostgresDB(withRuntime ...bool) {
 	DB = ConnPostgresDB("main", "DB")
+	if len(withRuntime) > 0 && withRuntime[0] {
+		RuntimeDB = ConnPostgresDB("runtime", "DB_RUNTIME")
+	}
 }

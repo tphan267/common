@@ -9,6 +9,9 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 const (
@@ -40,6 +43,15 @@ func GenerateID() (string, error) {
 
 func GeneratePassword(length int) (string, error) {
 	return GenerateRandomString(length, alphabets+"!@#$%^&*()_+")
+}
+
+func UCWord(input string) string {
+	titleCaser := cases.Title(language.Und)
+	words := strings.Fields(input)
+	for i, word := range words {
+		words[i] = titleCaser.String(word)
+	}
+	return strings.Join(words, " ")
 }
 
 func RemoveSignChars(s string) string {
