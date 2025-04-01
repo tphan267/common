@@ -13,36 +13,37 @@ type Params map[string]any
 // 	Set(key string, val any)
 // }
 
-func (p *Params) Set(key string, val any) {
+func (p Params) Set(key string, val any) {
 	params := p
 	keys := strings.Split(key, ".")
 	l := len(keys) - 1
 	for i, k := range keys {
-		if existParams, ok := (*params)[k]; !ok {
+		if existParams, ok := params[k]; !ok {
 			// key not exists
 			if i == l {
-				(*params)[k] = val
+				params[k] = val
 			} else {
 				newParams := Params{}
-				(*params)[k] = newParams
-				params = &newParams
+				params[k] = newParams
+				params = newParams
 			}
 		} else {
 			// key exists
 			if i == l {
-				(*params)[k] = val
+				params[k] = val
 			} else {
-				exist := Params(existParams.(map[string]any))
-				params = &exist
+				// exist := Params(existParams.(map[string]any))
+				// params = exist
+				params = Params(existParams.(map[string]any))
 			}
 		}
 	}
 }
 
-func (p *Params) Get(key string) any {
+func (p Params) Get(key string) any {
 	var val any
 	var ok bool
-	params := *p
+	params := p
 	keys := strings.Split(key, ".")
 	l := len(keys) - 1
 	for i, k := range keys {
@@ -57,7 +58,7 @@ func (p *Params) Get(key string) any {
 	return nil
 }
 
-func (p *Params) GetParams(key string, defaultVals ...*Params) *Params {
+func (p Params) GetParams(key string, defaultVals ...*Params) *Params {
 	if val := p.Get(key); val != nil {
 		params := Params(val.(map[string]any))
 		return &params
@@ -68,7 +69,7 @@ func (p *Params) GetParams(key string, defaultVals ...*Params) *Params {
 	return nil
 }
 
-func (p *Params) GetString(key string, defaultVals ...string) string {
+func (p Params) GetString(key string, defaultVals ...string) string {
 	if val := p.Get(key); val != nil {
 		return val.(string)
 	}
@@ -78,7 +79,7 @@ func (p *Params) GetString(key string, defaultVals ...string) string {
 	return ""
 }
 
-func (p *Params) GetBool(key string, defaultVals ...bool) bool {
+func (p Params) GetBool(key string, defaultVals ...bool) bool {
 	if val := p.Get(key); val != nil {
 		return val.(bool)
 	}
@@ -88,7 +89,7 @@ func (p *Params) GetBool(key string, defaultVals ...bool) bool {
 	return false
 }
 
-func (p *Params) GetInt(key string, defaultVals ...int) int {
+func (p Params) GetInt(key string, defaultVals ...int) int {
 	if val := p.Get(key); val != nil {
 		return int(utils.ToInt(val))
 	}
@@ -98,14 +99,14 @@ func (p *Params) GetInt(key string, defaultVals ...int) int {
 	return 0
 }
 
-func (p *Params) GetUint(key string) uint {
+func (p Params) GetUint(key string) uint {
 	if val := p.Get(key); val != nil {
 		return uint(utils.ToInt(val))
 	}
 	return 0
 }
 
-func (p *Params) GetUint64(key string) uint64 {
+func (p Params) GetUint64(key string) uint64 {
 	if val := p.Get(key); val != nil {
 		return uint64(utils.ToInt(val))
 	}

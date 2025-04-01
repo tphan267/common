@@ -58,7 +58,7 @@ func CopyFile(source string, dest string) (err error) {
 	defer destfile.Close()
 	_, err = io.Copy(destfile, sourcefile)
 	if err == nil {
-		if sourceinfo, err := os.Stat(source); err != nil {
+		if sourceinfo, err := os.Stat(source); err == nil {
 			err = os.Chmod(dest, sourceinfo.Mode())
 		}
 	}
