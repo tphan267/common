@@ -3,14 +3,22 @@ package utils
 import "strconv"
 
 func ToInt(value any) int {
+	return int(ToFloat64(value))
+}
+
+func ToInt64(value any) int64 {
+	return int64(ToFloat64(value))
+}
+
+func ToFloat64(value any) float64 {
 	switch v := value.(type) {
 	case int:
-		return v
+		return float64(v)
 	case float64:
-		return int(v)
+		return v
 	case string:
-		if i, err := strconv.Atoi(v); err == nil {
-			return i
+		if f, err := strconv.ParseFloat(v, 64); err == nil {
+			return f
 		}
 	}
 	return 0

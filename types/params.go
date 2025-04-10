@@ -13,6 +13,18 @@ type Params map[string]any
 // 	Set(key string, val any)
 // }
 
+func (p Params) IsEmpty() bool {
+	return len(p) == 0
+}
+
+func (p Params) Copy() (Params, error) {
+	dest := Params{}
+	if err := utils.Copy(&p, &dest); err != nil {
+		return nil, err
+	}
+	return dest, nil
+}
+
 func (p Params) Set(key string, val any) {
 	params := p
 	keys := strings.Split(key, ".")
@@ -58,15 +70,31 @@ func (p Params) Get(key string) any {
 	return nil
 }
 
-func (p Params) GetParams(key string, defaultVals ...*Params) *Params {
+func (p Params) GetParams(key string, defaultVals ...Params) Params {
 	if val := p.Get(key); val != nil {
-		params := Params(val.(map[string]any))
-		return &params
+		if params, ok := val.(map[string]any); ok {
+			return Params(params)
+		}
 	}
 	if len(defaultVals) > 0 {
 		return defaultVals[0]
 	}
 	return nil
+}
+
+func (p Params) GetSliceParams(key string) []Params {
+	var slicesParams []Params
+	if val := p.Get(key); val != nil {
+		if data, ok := val.([]any); ok {
+			slicesParams = make([]Params, 0, len(data))
+			for _, val := range data {
+				if params, ok := val.(map[string]any); ok {
+					slicesParams = append(slicesParams, Params(params))
+				}
+			}
+		}
+	}
+	return slicesParams
 }
 
 func (p Params) GetString(key string, defaultVals ...string) string {
@@ -89,9 +117,29 @@ func (p Params) GetBool(key string, defaultVals ...bool) bool {
 	return false
 }
 
+func (p Params) GetFloat64(key string, defaultVals ...float64) float64 {
+	if val := p.Get(key); val != nil {
+		return utils.ToFloat64(val)
+	}
+	if len(defaultVals) > 0 {
+		return defaultVals[0]
+	}
+	return 0
+}
+
 func (p Params) GetInt(key string, defaultVals ...int) int {
 	if val := p.Get(key); val != nil {
-		return int(utils.ToInt(val))
+		return int(utils.ToFloat64(val))
+	}
+	if len(defaultVals) > 0 {
+		return defaultVals[0]
+	}
+	return 0
+}
+
+func (p Params) GetInt64(key string, defaultVals ...int64) int64 {
+	if val := p.Get(key); val != nil {
+		return int64(utils.ToFloat64(val))
 	}
 	if len(defaultVals) > 0 {
 		return defaultVals[0]
@@ -101,14 +149,14 @@ func (p Params) GetInt(key string, defaultVals ...int) int {
 
 func (p Params) GetUint(key string) uint {
 	if val := p.Get(key); val != nil {
-		return uint(utils.ToInt(val))
+		return uint(utils.ToFloat64(val))
 	}
 	return 0
 }
 
 func (p Params) GetUint64(key string) uint64 {
 	if val := p.Get(key); val != nil {
-		return uint64(utils.ToInt(val))
+		return uint64(utils.ToFloat64(val))
 	}
 	return 0
 }
