@@ -129,7 +129,7 @@ func (p Params) GetFloat64(key string, defaultVals ...float64) float64 {
 
 func (p Params) GetInt(key string, defaultVals ...int) int {
 	if val := p.Get(key); val != nil {
-		return int(utils.ToFloat64(val))
+		return utils.ToInt(val)
 	}
 	if len(defaultVals) > 0 {
 		return defaultVals[0]
@@ -139,7 +139,7 @@ func (p Params) GetInt(key string, defaultVals ...int) int {
 
 func (p Params) GetInt64(key string, defaultVals ...int64) int64 {
 	if val := p.Get(key); val != nil {
-		return int64(utils.ToFloat64(val))
+		return utils.ToInt64(val)
 	}
 	if len(defaultVals) > 0 {
 		return defaultVals[0]
@@ -149,14 +149,14 @@ func (p Params) GetInt64(key string, defaultVals ...int64) int64 {
 
 func (p Params) GetUint(key string) uint {
 	if val := p.Get(key); val != nil {
-		return uint(utils.ToFloat64(val))
+		return uint(utils.ToInt(val))
 	}
 	return 0
 }
 
 func (p Params) GetUint64(key string) uint64 {
 	if val := p.Get(key); val != nil {
-		return uint64(utils.ToFloat64(val))
+		return uint64(utils.ToInt64(val))
 	}
 	return 0
 }
