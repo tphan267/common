@@ -99,6 +99,13 @@ func ReplaceSpecialChars(s, replace, skip string) string {
 	return s
 }
 
+func StringWithDefault(val string, defaultVal string) string {
+	if val != "" {
+		return val
+	}
+	return defaultVal
+}
+
 func StringToInt(val string) int {
 	i, err := strconv.Atoi(val)
 	if err != nil {

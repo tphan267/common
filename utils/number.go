@@ -2,6 +2,27 @@ package utils
 
 import "strconv"
 
+func IntWithDefault(val int, defaultVal int) int {
+	if val != 0 {
+		return val
+	}
+	return defaultVal
+}
+
+func Int64WithDefault(val int64, defaultVal int64) int64 {
+	if val != 0 {
+		return val
+	}
+	return defaultVal
+}
+
+func FloatWithDefault(val float64, defaultVal float64) float64 {
+	if val != 0 {
+		return val
+	}
+	return defaultVal
+}
+
 func ToInt(value any) int {
 	switch v := value.(type) {
 	case int:
