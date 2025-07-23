@@ -11,10 +11,9 @@ import (
 	"github.com/tphan267/common/utils"
 )
 
-var (
-	instance *RedisCache
-	// redisClient *redis.Client
-)
+var instance *RedisCache
+
+// redisClient *redis.Client
 
 type RedisCache struct {
 	redisClient       *redis.Client
@@ -51,12 +50,12 @@ func Get(key string) (string, error) {
 }
 
 // SetObj set object/struct value
-func SetObj(key string, value interface{}, expiration ...time.Duration) error {
+func SetObj(key string, value any, expiration ...time.Duration) error {
 	return instance.SetObj(key, value, expiration...)
 }
 
 // GetObj get object/struct value
-func GetObj(key string, out interface{}) error {
+func GetObj(key string, out any) error {
 	return instance.GetObj(key, out)
 }
 
@@ -86,7 +85,7 @@ func (ins *RedisCache) Get(key string) (string, error) {
 	return ins.redisClient.Get(context.TODO(), key).Result()
 }
 
-func (ins *RedisCache) SetObj(key string, value interface{}, expiration ...time.Duration) error {
+func (ins *RedisCache) SetObj(key string, value any, expiration ...time.Duration) error {
 	p, err := json.Marshal(value)
 	if err != nil {
 		return err
@@ -94,7 +93,7 @@ func (ins *RedisCache) SetObj(key string, value interface{}, expiration ...time.
 	return ins.redisClient.Set(context.TODO(), key, p, ins.getExpiration(expiration...)).Err()
 }
 
-func (ins *RedisCache) GetObj(key string, out interface{}) error {
+func (ins *RedisCache) GetObj(key string, out any) error {
 	p, err := ins.redisClient.Get(context.TODO(), key).Bytes()
 	if err != nil {
 		return err

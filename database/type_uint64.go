@@ -13,7 +13,7 @@ type NullableUint64 struct {
 }
 
 // Scan implement Scan method to convert from database value
-func (n *NullableUint64) Scan(value interface{}) error {
+func (n *NullableUint64) Scan(value any) error {
 	if value == nil {
 		n.Uint64, n.Valid = 0, false
 		return nil

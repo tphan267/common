@@ -8,23 +8,23 @@ import (
 	"time"
 )
 
-func Get(url string, out interface{}, headers ...string) (err error) {
+func Get(url string, out any, headers ...string) (err error) {
 	return Request("GET", url, nil, out, headers...)
 }
 
-func Post(url string, data interface{}, out interface{}, headers ...string) (err error) {
+func Post(url string, data any, out any, headers ...string) (err error) {
 	return Request("POST", url, data, out, headers...)
 }
 
-func Put(url string, data interface{}, out interface{}, headers ...string) (err error) {
+func Put(url string, data any, out any, headers ...string) (err error) {
 	return Request("PUT", url, data, out, headers...)
 }
 
-func Delete(url string, out interface{}, headers ...string) (err error) {
+func Delete(url string, out any, headers ...string) (err error) {
 	return Request("DELETE", url, nil, out, headers...)
 }
 
-func Request(method string, url string, data interface{}, out interface{}, headers ...string) (err error) {
+func Request(method string, url string, data any, out any, headers ...string) (err error) {
 	var req *netHttp.Request
 
 	var in io.Reader

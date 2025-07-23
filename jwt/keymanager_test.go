@@ -36,7 +36,7 @@ func TestKeyManager_IssueAndDecryptJWE(t *testing.T) {
 	payload := []byte("test payload")
 	jweOptions := &JWEOptions{
 		ExpiresIn: 30 * time.Minute,
-		Headers: map[string]interface{}{
+		Headers: map[string]any{
 			"custom-header": "custom-value",
 		},
 	}
@@ -244,7 +244,7 @@ func TestKeyManager_JWE_WithCustomHeaders(t *testing.T) {
 	payload := []byte("payload with custom headers")
 	jweOptions := &JWEOptions{
 		ExpiresIn: 30 * time.Minute,
-		Headers: map[string]interface{}{
+		Headers: map[string]any{
 			"custom-header1": "value1",
 			"custom-header2": 12345,
 		},

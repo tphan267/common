@@ -1,7 +1,6 @@
 package system
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 
@@ -14,12 +13,12 @@ var loadEnv = false
 // perhaps not the best implementation
 func Env(key string, defaultValue ...string) string {
 	// load .env file
-	if loadEnv == false {
+	if !loadEnv {
 		if _, err := os.Stat(".env"); err != nil {
-			fmt.Printf("Config .env file does not exist! %s", err.Error())
+			Logger.Tracef("Config .env file does not exist! %s", err.Error())
 		} else {
 			if err := godotenv.Load(".env"); err != nil {
-				fmt.Printf("Error loading .env file! %s", err.Error())
+				Logger.Errorf("Error loading .env file! %s", err.Error())
 			}
 		}
 		loadEnv = true
@@ -44,4 +43,12 @@ func EnvInt(key string, defaultValue ...int) int {
 		return defaultValue[0]
 	}
 	return 0
+}
+
+func IsDEV() bool {
+	return Env("APP_MODE") == "DEV"
+}
+
+func IsPROD() bool {
+	return Env("APP_MODE") == "PROD"
 }

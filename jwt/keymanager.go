@@ -19,7 +19,7 @@ import (
 
 type JWEOptions struct {
 	ExpiresIn time.Duration
-	Headers   map[string]interface{}
+	Headers   map[string]any
 }
 
 type KeyManager struct {

@@ -66,7 +66,7 @@ func SendEx(opts *types.Params, subject string, message string, isText ...bool) 
 	return dialer.DialAndSend(m)
 }
 
-func NotifySupport(subject string, message interface{}) error {
+func NotifySupport(subject string, message any) error {
 	htmlMesasge := "<pre>\n" + utils.ToString(message) + "</pre>"
 	return Send(Supporter, subject, htmlMesasge)
 }

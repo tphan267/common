@@ -44,8 +44,6 @@ func (p Params) Set(key string, val any) {
 			if i == l {
 				params[k] = val
 			} else {
-				// exist := Params(existParams.(map[string]any))
-				// params = exist
 				params = Params(existParams.(map[string]any))
 			}
 		}
