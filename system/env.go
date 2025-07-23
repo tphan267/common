@@ -1,6 +1,7 @@
 package system
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 
@@ -15,10 +16,12 @@ func Env(key string, defaultValue ...string) string {
 	// load .env file
 	if !loadEnv {
 		if _, err := os.Stat(".env"); err != nil {
-			Logger.Tracef("Config .env file does not exist! %s", err.Error())
+			// NOTE: please do not use Logger here
+			// it was not initialized
+			fmt.Printf("Config .env file does not exist! %s", err.Error())
 		} else {
 			if err := godotenv.Load(".env"); err != nil {
-				Logger.Errorf("Error loading .env file! %s", err.Error())
+				fmt.Printf("Error loading .env file! %s", err.Error())
 			}
 		}
 		loadEnv = true
