@@ -50,7 +50,7 @@ func (p Params) Set(key string, val any) {
 	}
 }
 
-func (p Params) Get(key string) any {
+func (p Params) Get(key string, defaultVals ...any) any {
 	var val any
 	var ok bool
 	params := p
@@ -65,6 +65,9 @@ func (p Params) Get(key string) any {
 			}
 		}
 	}
+	if len(defaultVals) > 0 {
+		return defaultVals[0]
+	}
 	return nil
 }
 
@@ -77,7 +80,8 @@ func (p Params) GetParams(key string, defaultVals ...Params) Params {
 	if len(defaultVals) > 0 {
 		return defaultVals[0]
 	}
-	return nil
+	// empty Params
+	return Params{}
 }
 
 func (p Params) GetSliceParams(key string) []Params {
