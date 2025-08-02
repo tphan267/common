@@ -56,7 +56,9 @@ func RemoteAccount(token string) (act *AuthTokenData, err error) {
 	if err != nil || act.ID == 0 {
 		err = nil
 		resp := &AuthValidateResponse{}
-		err := http.Get(system.Env("AUTH_API")+"/auth/validate", resp, "Authorization", "Bearer "+token)
+		err := http.Get(system.Env("AUTH_API")+"/auth/validate", resp, map[string]string{
+			"Authorization": "Bearer " + token,
+		})
 		if err != nil {
 			return nil, err
 		}

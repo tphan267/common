@@ -9,7 +9,9 @@ import (
 
 func RefreshToken(token string) (string, error) {
 	resp := &AuthRefreshResponse{}
-	err := http.Post(system.Env("AUTH_API")+"/auth/refresh", nil, resp, "Authorization", "Bearer "+token)
+	err := http.Post(system.Env("AUTH_API")+"/auth/refresh", nil, resp, map[string]string{
+		"Authorization": "Bearer " + token,
+	})
 	if err != nil {
 		return "", err
 	}
