@@ -2,20 +2,18 @@ package system
 
 import "github.com/antigloss/go/logger"
 
-var (
-	Logger *logger.Logger
-)
+var Logger *logger.Logger
 
 func InitLogger(prefix string) {
 	var err error
 	Logger, err = logger.New(&logger.Config{
-		LogDir:            "./logs",
-		LogFileMaxSize:    200,
-		LogFileMaxNum:     500,
+		LogFileMaxSize:    25,
+		LogFileMaxNum:     100,
 		LogFileNumToDel:   50,
 		LogFilenamePrefix: prefix,
-		LogLevel:          logger.LogLevel(EnvInt("SYS_LOG_LEVEL", 2)), // sysLogger.LogLevelTrace,
-		LogDest:           logger.LogDestConsole,                       // sysLogger.LogDestConsole | logger.LogDestFile
+		LogDir:            Env("SYS_LOG_DIR", "./logs"),
+		LogLevel:          logger.LogLevel(EnvInt("SYS_LOG_LEVEL", int(logger.LogLevelWarn))),
+		LogDest:           logger.LogDest(EnvInt("SYS_LOG_DEST", int(logger.LogDestBoth))),
 		Flag:              logger.ControlFlagLogDate | logger.ControlFlagLogLineNum,
 	})
 	if err != nil {

@@ -39,7 +39,7 @@ func ConnMySqlDB(conn string, envPrefix string) *gorm.DB {
 	if err != nil {
 		system.Logger.Panic("Failed to connect to database")
 	}
-	system.Logger.Infof("Connect to MySQL Database: \"%s\"", system.Env("DB_NAME"))
+	system.Logger.Infof("Connect to MySQL Database: \"%s\"", system.Env(envPrefix+"_NAME"))
 	dbs[conn] = db
 	return db
 }
